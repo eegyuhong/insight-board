@@ -11,7 +11,7 @@ export default function Header() {
         <CheckCircle2Icon />
         <AlertTitle>정적 JS 파일을 활용하여 포트폴리오 방문자 현황을 확인할 수 있습니다.</AlertTitle>
         <AlertDescription>
-          <pre className='text-xs'><code>&lt;script src=&quot;https://insightboard.vercel.app/track.js&quot; data-project-id=&quot;test1234&quot;&gt;&lt;/script&gt;</code></pre>  
+          <pre className='text-xs'><code>&lt;script src=&quot;https://insight-board-omega.vercel.app/track.js&quot; data-project-id=&quot;test1234&quot;&gt;&lt;/script&gt;</code></pre>  
         </AlertDescription>
       </Alert>
       
