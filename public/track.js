@@ -32,7 +32,7 @@
   // 체류 시간 포함하여 전송하는 함수
   const sendTrackingData = () => {
     const stayDuration = Math.round((Date.now() - visitStart) / 1000); // 초 단위
-    fetch('https://YOUR-SUPABASE-PROJECT.supabase.co/functions/v1/track', {
+    fetch('https://ygfawnxknmyphzroozfc.supabase.co/functions/v1/track', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       keepalive: true, // 페이지 닫힐 때도 전송 시도
