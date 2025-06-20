@@ -19,7 +19,7 @@
 
   const visitStart = Date.now();
 
-  const payloadBase = {
+  const payload = {
     project,
     url: window.location.href,
     referrer: document.referrer,
@@ -29,38 +29,33 @@
     session_id: sessionId,
   };
 
-  let hasSent = false; // 중복 전송 방지
+  let hasSent = false; // 중복 전송 방지 플래그
 
+  // 체류 시간 포함하여 전송하는 함수
   const sendTrackingData = () => {
     if (hasSent) return;
     hasSent = true;
 
-    const stayDuration = Math.round((Date.now() - visitStart) / 1000);
+    const stayDuration = Math.round((Date.now() - visitStart) / 1000); // 초 단위
 
-    const fullPayload = {
-      ...payloadBase,
-      stay_duration: stayDuration,
-      timestamp: new Date().toISOString(),
-    };
-
-    try {
-      const blob = new Blob([JSON.stringify(fullPayload)], {
-        type: 'application/json',
-      });
-
-      const ok = navigator.sendBeacon(
-        'https://ygfawnxknmyphzroozfc.supabase.co/functions/v1/track',
-        blob,
-      );
-
-      if (!ok) {
-        console.warn('[InsightBoard] sendBeacon failed to queue request.');
-      }
-    } catch (err) {
-      console.warn('[InsightBoard] sendBeacon error:', err);
-    }
+    fetch('https://ygfawnxknmyphzroozfc.supabase.co/functions/v1/track', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnZmF3bnhrbm15cGh6cm9vemZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAyODk0MDEsImV4cCI6MjA2NTg2NTQwMX0.kNFJP950TlU1XGPGapvjcsDfFdYJ7bpAhG4-u0z1Jy0',
+      },
+      keepalive: true, // 페이지 닫힐 때도 전송 시도
+      body: JSON.stringify({
+        ...payload,
+        stay_duration: stayDuration,
+        timestamp: new Date().toISOString(),
+      }),
+    }).catch((err) => {
+      console.warn('[InsightBoard] tracking failed:', err);
+    });
   };
 
+  // 사용자가 페이지를 닫거나 이동할 때 체류시간 포함 전송
   window.addEventListener('beforeunload', sendTrackingData);
   window.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
