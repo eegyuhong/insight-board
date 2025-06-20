@@ -2,8 +2,7 @@
   const currentScript = document.currentScript;
   if (!currentScript) return;
 
-  const src = new URL(currentScript.src);
-  const project = src.searchParams.get('pid');
+  const project = currentScript.getAttribute('data-project-id');
 
   if (!project) {
     console.warn('[InsightBoard] project id (pid) missing in script URL.');
