@@ -29,9 +29,15 @@
     session_id: sessionId,
   };
 
+  let hasSent = false; // 중복 전송 방지 플래그
+
   // 체류 시간 포함하여 전송하는 함수
   const sendTrackingData = () => {
+    if (hasSent) return;
+    hasSent = true;
+
     const stayDuration = Math.round((Date.now() - visitStart) / 1000); // 초 단위
+
     fetch('https://ygfawnxknmyphzroozfc.supabase.co/functions/v1/track', {
       method: 'POST',
       headers: { 
