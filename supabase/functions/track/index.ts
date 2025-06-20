@@ -6,6 +6,32 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 
 Deno.serve(async (req) => {
+  const allowedOrigins = [
+    'https://test-product-crawler-production-5e1b.up.railway.app',
+    'https://eegyuhongs.vercel.app',
+    'https://react-disney-plus-113f9.web.app',
+    'https://eegyuhong.github.io/react-tictactoe',
+    'https://vanilla-movie-ts.vercel.app',
+    'https://elegant-tapioca-a44bc7.netlify.app',
+    'https://vanilla-apple-ipad.vercel.app',
+  ];
+  const origin = req.headers.get('origin') || '';
+  const isAllowedOrigin = allowedOrigins.includes(origin);
+
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': isAllowedOrigin ? origin : '',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  };
+
+  // OPTIONS 요청 처리 (CORS preflight)
+  if (req.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: corsHeaders,
+    });
+  }
+
   try {
     const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = Deno.env.toObject();
 
