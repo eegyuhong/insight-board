@@ -1,6 +1,7 @@
 export interface IVisitLog {
   id: string;
   created_at: string; // ISO 문자열 (timestamp with time zone)
+  created_date_kst: string;
   project: string;
   url: string;
   referrer: string;

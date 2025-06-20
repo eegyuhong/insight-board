@@ -14,12 +14,15 @@ function summarizeProjects(data: IVisitLog[]): IProjectSummary[] {
   const summaries: IProjectSummary[] = [];
 
   for (const [project, visits] of grouped.entries()) {
-    const totalVisits = visits.length;
+    // 고유한 세션 ID 수 계산
+    const uniqueSessions = new Set(visits.map((v) => v.session_id));
+    const totalVisits = uniqueSessions.size;
+    
     const totalDuration = visits.reduce((sum, v) => sum + v.stay_duration, 0);
     const avgDuration = totalDuration / totalVisits;
 
     // 방문 날짜 수 계산
-    const dateSet = new Set(visits.map((v) => v.created_at.slice(0, 10))); // 'YYYY-MM-DD'
+    const dateSet = new Set(visits.map((v) => v.created_date_kst)); // 'YYYY-MM-DD'
     const dailyAvg = totalVisits / dateSet.size;
 
     // url은 첫 번째 방문 기록의 url을 사용

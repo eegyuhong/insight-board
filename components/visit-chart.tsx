@@ -8,13 +8,11 @@ import {
   CardTitle,
   CardContent,
 } from './ui/card';
-import { ChartConfig, ChartContainer } from './ui/chart';
+import { ChartConfig, ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from './ui/chart';
 import {
   Area,
   AreaChart,
-  Legend,
   XAxis,
-  Tooltip,
   YAxis,
   CartesianGrid,
 } from 'recharts';
@@ -49,17 +47,22 @@ interface ProjectData {
 
 // 데이터 가공 함수
 function getChartData(logs: IVisitLog[]) {
-  const visitorMap = new Map<string, Map<string, number>>();
+  // Map<date, Map<project, Set<session_id>>>
+  const visitorMap = new Map<string, Map<string, Set<string>>>();
   const stayMap = new Map<string, Map<string, ProjectData>>();
 
   logs.forEach((log) => {
-    const date = log.created_at.slice(0, 10);
+    const date = log.created_date_kst;
     const project = log.project;
+    const sessionId = log.session_id;
 
+    // 방문자 맵 처리
     if (!visitorMap.has(date)) visitorMap.set(date, new Map());
     const visitorSubMap = visitorMap.get(date)!;
-    visitorSubMap.set(project, (visitorSubMap.get(project) || 0) + 1);
+    if (!visitorSubMap.has(project)) visitorSubMap.set(project, new Set());
+    visitorSubMap.get(project)!.add(sessionId);
 
+    // 체류시간 맵 처리
     if (!stayMap.has(date)) stayMap.set(date, new Map());
     const staySubMap = stayMap.get(date)!;
     const entry = staySubMap.get(project) || { sum: 0, count: 0 };
@@ -71,7 +74,7 @@ function getChartData(logs: IVisitLog[]) {
   const allProjects = Array.from(new Set(logs.map((l) => l.project)));
 
   const buildData = (
-    baseMap: Map<string, Map<string, number | ProjectData>>,
+    baseMap: Map<string, Map<string, Set<string> | ProjectData>>,
     isStayTime = false,
   ): ChartDataPoint[] => {
     return Array.from(baseMap.entries())
@@ -84,10 +87,10 @@ function getChartData(logs: IVisitLog[]) {
           } else {
             const value = projectMap.get(project);
             if (value !== undefined) {
-              if (isStayTime && typeof value !== 'number') {
+              if (isStayTime && !(value instanceof Set)) {
                 row[project] = Math.round(value.sum / value.count);
-              } else if (!isStayTime && typeof value === 'number') {
-                row[project] = value;
+              } else if (!isStayTime && value instanceof Set) {
+                row[project] = value.size; // Set의 크기로 고유 방문자 수 계산
               }
             }
           }
@@ -97,14 +100,17 @@ function getChartData(logs: IVisitLog[]) {
   };
 
   return {
-    visitors: buildData(visitorMap as Map<string, Map<string, number | ProjectData>>),
-    avgStay: buildData(stayMap as Map<string, Map<string, number | ProjectData>>, true),
+    visitors: buildData(visitorMap as Map<string, Map<string, Set<string> | ProjectData>>),
+    avgStay: buildData(stayMap as Map<string, Map<string, Set<string> | ProjectData>>, true),
   };
 }
 
 // 방문자 수 차트 컴포넌트
 export default function VisitChart({ data }: { data: IVisitLog[] }) {
   const { visitors, avgStay } = getChartData(data);
+
+  console.log(visitors);
+
   const [chartType, setChartType] = useState<'visitors' | 'avgStay'>('visitors');
   const [visibleProjects, setVisibleProjects] = useState<Record<string, boolean>>(() => {
     const projects = Object.keys(visitors[0] ?? {}).filter((k) => k !== 'date');
@@ -212,14 +218,22 @@ export default function VisitChart({ data }: { data: IVisitLog[] }) {
               dataKey="date"
               tickFormatter={(value) => value.slice(5)}
               tickLine={false}
+              axisLine={false}
+              tickMargin={8}
             />
-            <YAxis tickLine={false} />
-            <Tooltip
-              formatter={(value: number, name: string) =>
-                [value, dynamicChartConfig[name]?.label || name]
+            <YAxis tickLine={false} axisLine={false} tickMargin={8} />
+            <ChartTooltip
+              cursor={false}
+              content={
+                <ChartTooltipContent
+                  labelFormatter={(value) => {
+                    return value.slice(5);
+                  }}
+                  indicator="dot"
+                />
               }
             />
-            <Legend />
+            <ChartLegend content={<ChartLegendContent />} />
             {projects.map(
               (project, index) =>
                 visibleProjects[project] && (
