@@ -10,7 +10,7 @@ Deno.serve(async (req) => {
     'https://test-product-crawler-production-5e1b.up.railway.app',
     'https://eegyuhongs.vercel.app',
     'https://react-disney-plus-113f9.web.app',
-    'https://eegyuhong.github.io/react-tictactoe',
+    'https://eegyuhong.github.io',
     'https://vanilla-movie-ts.vercel.app',
     'https://elegant-tapioca-a44bc7.netlify.app',
     'https://vanilla-apple-ipad.vercel.app',
