@@ -34,7 +34,10 @@
     const stayDuration = Math.round((Date.now() - visitStart) / 1000); // 초 단위
     fetch('https://ygfawnxknmyphzroozfc.supabase.co/functions/v1/track', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnZmF3bnhrbm15cGh6cm9vemZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAyODk0MDEsImV4cCI6MjA2NTg2NTQwMX0.kNFJP950TlU1XGPGapvjcsDfFdYJ7bpAhG4-u0z1Jy0',
+      },
       keepalive: true, // 페이지 닫힐 때도 전송 시도
       body: JSON.stringify({
         ...payload,
