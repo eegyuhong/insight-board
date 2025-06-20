@@ -188,7 +188,7 @@ export default function VisitChart({ data }: { data: IVisitLog[] }) {
       </CardHeader>
 
       <CardContent className="px-2 sm:p-6">
-        <ChartContainer config={dynamicChartConfig}>
+        <ChartContainer className="w-full max-h-80" config={dynamicChartConfig}>
           <AreaChart data={chartData}>
             <defs>
               {projects.map((project, index) => (
