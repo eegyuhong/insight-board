@@ -1,18 +1,9 @@
-export const dynamic = 'force-dynamic';
-export const fetchCache = 'force-no-store';
-export const revalidate = 0;
+import type { IVisitLog } from '@/types';
 
-import { createClient } from '@/lib/supabase/server';
 import ProjectSummaryGrid from './project-summary-grid';
 import VisitChart from './visit-chart';
 
-export default async function Main() {
-  const supabase = createClient();
-  const { data } = await supabase
-    .from('visit_logs')
-    .select('*')
-    .abortSignal(new AbortController().signal);
-
+export default function Main({ data }: { data: IVisitLog[] }) {
   const formatted = data?.map((log) => ({
     ...log,
     created_date_kst: new Intl.DateTimeFormat('sv-SE', {

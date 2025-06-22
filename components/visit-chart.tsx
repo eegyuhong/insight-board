@@ -109,8 +109,6 @@ function getChartData(logs: IVisitLog[]) {
 export default function VisitChart({ data }: { data: IVisitLog[] }) {
   const { visitors, avgStay } = getChartData(data);
 
-  console.log(visitors);
-
   const [chartType, setChartType] = useState<'visitors' | 'avgStay'>('visitors');
   const [visibleProjects, setVisibleProjects] = useState<Record<string, boolean>>(() => {
     const projects = Object.keys(visitors[0] ?? {}).filter((k) => k !== 'date');
